@@ -2,6 +2,7 @@
 <head>
 	<title>Lista telefonica</title>
 	<script src="angular.min.js"></script>
+	<script src="angular-messages.js"></script>
 	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 	
 	<style>
@@ -27,7 +28,7 @@
 	</style>
 
 	<script>
-	angular.module("listaTelefonica", []);
+	angular.module("listaTelefonica", ["ngMessages"]);
 		angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope) {
 			$scope.app = "Lista telefonica";
 			$scope.contatos = [
@@ -46,6 +47,7 @@
 			$scope.adicionarContato = function(contato){						
 				$scope.contatos.push(angular.copy(contato));				
 				delete $scope.contato;
+				$scope.contatoForm.$setPristine();
 			};
 
 			$scope.apagarContatos = function(contatos){
@@ -82,31 +84,48 @@
 			</tr>	
 		</table>
 		<hr/>
+		<form name="contatoForm">
+			<input class="form-control" type="text" name="nome"  ng-model="contato.nome" ng-required="true">
+			<input class="form-control" type="text" name="telefone" ng-model="contato.telefone" ng-required="true" ng-pattern="/^\d{4,5}-\d{4}/">
 
-		<input class="form-control" type="text" ng-model="contato.nome">
-		<input class="form-control" type="text" ng-model="contato.telefone">
+			<div class="form-group">
+				<select class="form-control" ng-model="contato.operadora" ng-options="operadora.codigo as operadora.nome for operadora in operadoras">
+					<option  value="" >Selecione uma operadora</option>
+				</select>
 
-		<div class="form-group">
-			<select class="form-control" ng-model="contato.operadora" ng-options="operadora.codigo as operadora.nome for operadora in operadoras">
-				<option  value="" >Selecione uma operadora</option>
-			</select>
+				<button class="btn btn-primary btn-block"  							
+								ng-click="adicionarContato(contato)" 
+								ng-disabled="contatoForm.$invalid">
+					Adicionar contato
+				</button>
+				
+				<button class="btn btn-danger btn-block"  							
+						ng-click="apagarContatos(contatos)" ng-disabled="!isConstatoSelecionado(contatos)" >
+					Apagar contatos
+				</button>
 
-			<button class="btn btn-primary btn-block"  
-							ng-disabled="!contato.nome || !contato.telefone" 
-							ng-click="adicionarContato(contato)" >
-				Adicionar contato
-			</button>
-			
-			<button class="btn btn-danger btn-block"  							
-					ng-click="apagarContatos(contatos)" ng-disabled="!isConstatoSelecionado(contatos)" >
-				Apagar contatos
-			</button>
+			</div>		
+		</form>
 
-		</div>		
-		
+		<div ng-show="contatoForm.nome.$dirty" 
+				ng-messages="contatoForm.nome.$error" >
+			<div ng-message="required" class="alert alert-danger">
+				Por favor preencha o nome!			
+			</div>
+		</div>
+
+		<div ng-show="contatoForm.telefone.$dirty" 
+				ng-messages="contatoForm.telefone.$error" >
+				<div class="alert alert-danger" ng-message="required" >
+					Por favor adicione um telefone
+				</div>
+				<div class="alter alter-danger" ng-message="pattern"  >
+					Por favor adicione um telefone no formato 999-9999
+				</div>
+		</div>
+
 	</div>
-	<div ng-include="'footer.html'">
-		
-	</div>
+<!-- 	<div ng-include="'footer.html'">		
+	</div> -->
 </body>
 </html>
