@@ -6,7 +6,7 @@ angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($s
 
 	var carregarContatos = function () {
 		contatosAPI.getContatos().success(function (data) {
-			$scope.contatos = data;
+			$scope.contatos = data;			
 		}).error(function (data, status) {
 			$scope.message = "Aconteceu um problema: " + data;
 		});
